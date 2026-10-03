@@ -28,7 +28,7 @@ Gear ratio `i`, pitch diameters `d₁`/`d₂`, addendum circles `dₐ`, dedendum
 | Elasticity factor `Z_E` | **Table 10-6**, dropdown (steel-steel and other pairings) |
 | Zone factor `Z_H` | **Eq. (10-9)**, computes `√(2/(cosα·sinα))` |
 | Contact ratio factor `Z_ε` | **Eq. (10-9)**, computes `√((4−ε_α)/3)` |
-| Bending contact ratio factor `Y_ε` | **Manual input** — the formula's textbook source is not yet verified, so it is deliberately not automated |
+| Bending contact ratio factor `Y_ε` | **Eq. (10-5)**, computes `0.25 + 0.75/ε_α` |
 | Contact stress `σ_H` | **Eq. (10-10)** |
 | Bending stress `σ_F` | **Eq. (10-6)** |
 | Minimum required module `m_min` | **Eq. (10-7)**, solved backwards |
@@ -43,6 +43,7 @@ A permanent checklist at the bottom of the UI maps every computed quantity to it
 ```
 ✓ Geometry (10 items)         · Table 10-2
 ✓ Bending stress σ_F          · Eq. (10-6)
+✓ Contact ratio factor Y_ε    · Eq. (10-5)
 ✓ Design formula m_min        · Eq. (10-7)
 ✓ Y_Fa / Y_Sa                 · Table 10-5
 ✓ Elasticity factor Z_E       · Table 10-6
@@ -56,17 +57,17 @@ A permanent checklist at the bottom of the UI maps every computed quantity to it
 - ***Machine Design* (机械设计), 11th ed.** — compiled by the Teaching and Research Section of Machine Theory and Machine Elements, Northwestern Polytechnical University; edited by Pu Lianggui, Chen Guoding, Wu Liyan and Ning Fangli. Higher Education Press, 2024.
   Every "Eq. (10-x)" and "Table 10-x" label in the UI refers to **Chapter 10, Gear Drives** of this book.
 - ***Theory of Machines and Mechanisms* (机械原理), 9th ed.** — compiled by the Teaching and Research Section of Machine Theory and Machine Elements, Northwestern Polytechnical University; edited by Sun Huan and Ge Wenjie. Higher Education Press, 2021.
-  Reference for gear meshing parameters such as the transverse contact ratio `ε_α`, which this tool takes as a manual input rather than computing.
+  Reference for gear meshing parameters such as the transverse contact ratio `ε_α`, which this tool takes as a manual input rather than computing. Both `Z_ε` (Eq. 10-9) and `Y_ε` (Eq. 10-5) are then derived from it.
 
 Both books are *compiled* by Northwestern Polytechnical University — hence the colloquial name "the NPU edition" — but *published* by Higher Education Press.
 
-At the default parameters (m=3, z₁=20, z₂=60, α=20°, φd=1.0, T₁=50000 N·mm), the tool's output matches hand calculation:
+At the default parameters (m=3, z₁=20, z₂=60, α=20°, φd=1.0, T₁=50000 N·mm, ε_α=1.7), the tool's output matches hand calculation:
 
 | Result | Value |
 |---|---|
 | Contact stress σ_H | 356.8 MPa |
-| Bending stress σ_F | 33.8 MPa |
-| Minimum module m_min | 1.42 mm |
+| Bending stress σ_F | 33.3 MPa |
+| Minimum module m_min | 1.41 mm |
 | Minimum pitch diameter d₁min | 42.43 mm |
 
 ## Usage
@@ -88,7 +89,7 @@ This disclosure is not a disclaimer. It is there to make one thing clear: I can 
 
 ## Known limitations
 
-- **The bending contact ratio factor `Y_ε` is still entered by hand.** The relevant formula is on a page of the textbook I have not yet verified, and I would rather leave a gap than ship a formula I have not confirmed. (The contact-side factor `Z_ε` *is* computed automatically, via Eq. (10-9).)
+- **The transverse contact ratio `ε_α` is a manual input** (default 1.7); the tool does not compute it. `ε_α` follows from addendum-circle pressure angles and other meshing parameters, which belong to *Theory of Machines and Mechanisms* — this tool implements only the geometry and strength formulas of Chapter 10 of *Machine Design*. Once entered, `Z_ε` (Eq. 10-9) and `Y_ε` (Eq. 10-5) are derived automatically.
 - Supports **standard involute spur gears only** — no helical, profile-shifted, or bevel gears.
 - `σ_Hlim` / `σ_Flim` (contact and bending fatigue limits) must be looked up in a materials handbook and entered manually.
 

@@ -47,7 +47,7 @@
 <div class="wrap">
 
   <h1>齿轮传动设计计算工具 <span class="badge">v1.0</span></h1>
-  <div class="sub">标准渐开线直齿圆柱齿轮 · 几何计算 + 强度校核 —— 全部公式已按《机械设计》教材逐条核对（表 10-2 / 10-5 / 10-6，式 10-6 ~ 10-11）</div>
+  <div class="sub">标准渐开线直齿圆柱齿轮 · 几何计算 + 强度校核 —— 全部公式已按《机械设计》教材逐条核对（表 10-2 / 10-5 / 10-6，式 10-5 ~ 10-11）</div>
   <div style="margin: 12px 0 18px;">
     <button onclick="exportReport()" style="cursor:pointer;background:#14304f;color:#fff;border:none;
       padding:9px 18px;border-radius:5px;font-size:13px;font-family:inherit;letter-spacing:.5px;">
@@ -103,7 +103,7 @@
       <div>
         <div class="field"><label>齿形系数 Y_Fa <span style="font-size:11px;color:#1e7e34;">自动查表</span></label><span><input id="YFa" type="text" value="2.800" readonly style="background:#f4fbf5;color:#1e7e34;font-weight:600;"></span></div>
         <div class="field"><label>应力修正系数 Y_Sa <span style="font-size:11px;color:#1e7e34;">自动查表</span></label><span><input id="YSa" type="text" value="1.550" readonly style="background:#f4fbf5;color:#1e7e34;font-weight:600;"></span></div>
-        <div class="field"><label>重合度系数 Y_ε</label><span><input id="YEps" type="number" value="0.70" step="0.01"></span></div>
+        <div class="field"><label>重合度系数 Y_ε <span style="font-size:10.5px;color:#1e7e34;">式10-5</span></label><span><input id="YEps" type="text" value="0.691" readonly style="background:#f4fbf5;color:#1e7e34;font-weight:600;"></span></div>
         <div class="field"><label>弯曲疲劳极限 σ_Flim</label><span><input id="sFlim" type="number" value="450" step="10"><span class="unit">MPa</span></span></div>
         <div class="field"><label>安全系数 S_F</label><span><input id="SF" type="number" value="1.4" step="0.05"></span></div>
       </div>
@@ -121,6 +121,7 @@
     <b>核对进度</b>
     <span class="ok">✓</span> 几何尺寸（10 条）· <b>表 10-2</b>　|
     <span class="ok">✓</span> 弯曲强度 σ_F · <b>式 (10-6)</b>　|
+    <span class="ok">✓</span> 重合度系数 Y_ε · <b>式 (10-5)</b>　|
     <span class="ok">✓</span> 设计公式 m_min · <b>式 (10-7)</b>　|
     <span class="ok">✓</span> Y_Fa / Y_Sa · <b>表 10-5</b>　|
     <span class="ok">✓</span> 弹性系数 Z_E · <b>表 10-6</b>　|
@@ -225,6 +226,7 @@ function exportReport() {
     ・表 10-2（渐开线标准直齿圆柱齿轮几何尺寸计算公式）<br>
     ・表 10-5（齿形系数 Y_Fa、应力修正系数 Y_Sa）<br>
     ・表 10-6（弹性影响系数 Z_E）<br>
+    ・式 (10-5)（弯曲强度重合度系数 Y_ε = 0.25 + 0.75/ε_α）<br>
     ・式 (10-6)（齿根弯曲疲劳强度校核）　・式 (10-7)（弯曲强度设计公式）<br>
     ・式 (10-9)（重合度系数 Z_ε = √((4−ε_α)/3)）<br>
     ・式 (10-10)（齿面接触疲劳强度校核）　・式 (10-11)（接触强度设计公式）<br>
@@ -295,7 +297,9 @@ function calc() {
   const ZEps = (epsA > 0 && epsA < 4) ? Math.sqrt((4 - epsA) / 3) : NaN;
   document.getElementById('ZH').value   = isNaN(ZH)   ? '—' : ZH.toFixed(3);
   document.getElementById('ZEps').value = isNaN(ZEps) ? '—' : ZEps.toFixed(3);
-  const YEps = num('YEps');
+  // [已核对 式(10-5)，教材 P212] 弯曲强度重合度系数 Y_ε = 0.25 + 0.75/ε_α
+  const YEps = (epsA > 0) ? (0.25 + 0.75 / epsA) : NaN;
+  document.getElementById('YEps').value = isNaN(YEps) ? '—' : YEps.toFixed(3);
   const ys  = lookupYS(z1);                 // 查 表 10-5
   const YFa = ys ? ys[0] : 0;
   const YSa = ys ? ys[1] : 0;
